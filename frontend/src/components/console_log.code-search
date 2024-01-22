@@ -1,0 +1,528 @@
+# Query: console.log
+# ContextLines: 1
+
+215 results - 37 files
+
+backend/src/Canvas.ts:
+  150      rendering(Client: Socket) {
+  151:         //console.log(this.Info.Connected.length);
+  152:         //console.log("Rendering...");
+  153          if (this.Info.Running === true)
+
+  210          if (this.Info.Player1.score === 7 || this.Info.Player2.score === 7) {
+  211:             //console.log(this.id);
+  212              this.Room.to(this.id).emit('EndGame', this.Info);
+
+  219          if (player === 'u1' && this.collision(this.Info.Balling, this.Info.Player1)) {
+  220:             //console.log('u1');
+  221:             //console.log(this.Info.Balling);
+  222              if (this.getInfo().Balling.custom === true) {
+
+  236          else if (player === 'u2' && this.collision(this.Info.Balling, this.Info.Player2)) {
+  237:             //console.log('u2');
+  238:             //console.log(this.Info.Balling);
+  239              if (this.getInfo().Balling.custom === true) {
+
+backend/src/main.ts:
+  37    await app.listen(PORT);
+  38:   //console.log(`App listening on port: ${PORT}`)
+  39  }
+
+backend/src/authentication/authentication.controller.ts:
+   50    auth() {
+   51:     //console.log(`authentication.controller: auth(42auth)`);
+   52    }
+
+   76    async redirect(@Req() req: ExpressRequest, @Res() res: ExpressResponse) {
+   77:     //console.log(`authentication.controller: redirect(signin) ---> SUCCESS`);
+   78      let flog = true;
+
+  121      } catch (error) {
+  122:       //console.log(error);
+  123      }
+
+backend/src/authentication/authentication.service.ts:
+  14    async validateUser(username: string, password: string): Promise<any> {
+  15:     //console.log(`authentication.service validateUser(${username})`);
+  16      const user = await this.usersService.getByLogin(username);
+  17:     //console.log(user);
+  18      if (user) {
+
+  25    async login(user: any) {
+  26:     //console.log(`authentication.service login(${user.login})`);
+  27      const payload = {
+
+backend/src/authentication/jwt.strategy.ts:
+  24      if (founduser) {
+  25:       //console.log(`jwt.strategy: validate(user = ${founduser})`);
+  26        return founduser;
+
+backend/src/authentication/serializer.ts:
+  12    serializeUser(user: any, done: Function) {
+  13:     //console.log(`serialize(${user})`);
+  14      done(null, user);
+
+  17    deserializeUser(payload: any, done: Function) {
+  18:     //console.log(`deserialize(${payload})`);
+  19      const found = this.userService.getByLogin(payload.login);
+
+backend/src/game/game.gateway.ts:
+   48    afterInit(server: Server) {
+   49:     //console.log('Game server initialized');
+   50      this.LobbyManager.Room = server;
+
+   58      if (!client || client === undefined) {
+   59:       //console.log('No client provided');
+   60      }
+
+   64      ) {
+   65:       //console.log('No token provided');
+   66        return;
+
+   70      try {
+   71:       //console.log('tokne ' + token);
+   72        const info = jwt.verify(token, Buffer.from(secret, 'base64'));
+
+   80        client.data.username = Object.values(info)[0];
+   81:       //console.log(`${client.data.username} connected`);
+   82        this.ListOfPlayers.set(client.data.username, client);
+   83        this.userService.updateStatus(client.data.username, 'online');
+   84:       //console.log('Token provided');
+   85      } catch (err) {
+   86:       //console.log(err);
+   87        return;
+
+  101        throw new Error('You are already ready');
+  102:     //console.log(`${client.data.username} is ready to play`);
+  103      if (this.LobbyManager.isInLobby(client.data.username))
+
+  139    ): any {
+  140:     //console.log('Attempting to create a lobby');
+  141      this.LobbyManager.createLobby('Classic');
+  142:     //console.log(this.LobbyManager.LobbyList.length);
+  143      return 'You have create a Classic lobby';
+
+  150    ): any {
+  151:     //console.log('Attempting to create A Rainbow lobby');
+  152      this.LobbyManager.createLobby('Rainbow');
+  153:     //console.log(this.LobbyManager.LobbyList.length);
+  154      return 'You have create a Rainbow lobby';
+
+  160    ): any {
+  161:     //console.log(`Player ${client.data.username} is joining a lobby`);
+  162      this.LobbyManager.JoinLobby(client.data.username, client, 0);
+
+  170    ): any {
+  171:     //console.log('Ping received');
+  172      if (
+
+  183    ): any {
+  184:     //console.log('Attempting to invite ' + data);
+  185      const user = this.ListOfPlayers.get(data);
+  186      if (user === undefined || user === null) {
+  187:       //console.log('User not found');
+  188        client.emit('NoUser', "The user you're trying to invite isn't online");
+
+  194      if (this.ListOfPlayers.get(data) !== undefined) {
+  195:       //console.log('You are trying to invite ' + data);
+  196        this.userService.getByLogin(client.data.username).then((user) => {
+
+  208  
+  209:     //console.log('You have refused the invite from ' + data);
+  210      this.userService.getByPseudo(data).then((user) => {
+
+  222    ) {
+  223:     //console.log('You have accepted the invite to play by ' + data);
+  224      const user = await this.userService.getByPseudo(data);
+
+  247      client.emit('RemovePlayer', client.data.username);
+  248:     //console.log(
+  249        `${client.data.username} has been disconnected :  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! + reason`,
+
+  259      if (!client || client === undefined) return;
+  260:     //console.log(`${client.data.username} has ended the game`);
+  261      this.LobbyManager.EndGame(client.data.username);
+
+  269      if (!client || client === undefined) return;
+  270:     //console.log(client.handshake.headers.authorization);
+  271:     //console.log(`${client.data.username}' - asking for lobby info`);
+  272      this.LobbyManager.printLobby();
+
+  290      if (!client || client === undefined) return;
+  291:     //console.log(`${client.data.username} is trying to spectating ` + data);
+  292      if (this.ListOfPlayers.get(data) === undefined) {
+
+  305      }
+  306:     //console.log(`${client.data.username} is spectating ` + data);
+  307      this.LobbyManager.SpectatorJoin(client.data.username, data, client);
+
+  325            client.emit("isPlaying", true);
+  326:           //console.log(client.connected);
+  327:           //console.log(`${client.data.username} is playing`);
+  328          }
+
+  331      }
+  332:     //console.log('ah');
+  333      return false;
+
+backend/src/lobby/lobby.ts:
+   72      let index = 0;
+   73:     //console.log(`${login} is trying to join a lobby`);
+   74      if (this.isInLobby(login))
+
+   91  
+   92:           //console.log(`${client.data.username}  joined lobby ` + tLobby.id.toString());
+   93            if (tLobby.Waiting.length === 2) {
+   94:             //console.log('Starting game in lobby ' + tLobby.id.toString());
+   95              tLobby.Instance.setRoom(this.Room);
+
+  140          client.leave(tLobby.id.toString());
+  141:         //console.log('Player left lobby ' + tLobby.id.toString());
+  142          tLobby.Instance.Info.Connected.splice(0, 2);
+
+  184        if (index > -1) {
+  185:         //console.log(tLobby);
+  186          if (index === 0) {
+
+  246      }
+  247:     //console.log("lobbylist after delete : ", this.LobbyList);
+  248    }
+
+  250    LeaveLobby(login: string) {
+  251:     //console.log("Trying to leave lobby...");
+  252      let id = 0;
+
+  258            if (tLobby.Instance.Disconnect(login) === 'STOP') {
+  259:             //console.log('Found player to disconnect ' + tLobby.id.toString());
+  260              tLobby.socketing
+
+  351    printLobby() {
+  352:     //console.log(this.LobbyList);
+  353    }
+
+  357      if (tLobby) return tLobby.Instance;
+  358:     else //console.log('Lobby/Instance not found');
+  359      return undefined;
+
+backend/src/users/users.controller.ts:
+   35    async getFile(@Req() req: ExpressRequest, @Res() res: ExpressResponse) {
+   36:     //console.log(`users.controller: getFile()`);
+   37      if (req.file && req.body.user) {
+
+  112    async getProfil(@Param('log') log: string, @Res() res: ExpressResponse) {
+  113:     ////console.log(`usersService.initProfile() -> ${id}`);
+  114      const user = await this.usersService.getByLogin(log);
+
+  166    async getMatchHistory(@Param('id') id: number, @Res() res: ExpressResponse) {
+  167:     //console.log(`users.controller: getMatchHistory(${id})`);
+  168  
+
+  172      }
+  173:     //console.log('oof');
+  174      return res.status(400).send(['Failed to request the match history.']);
+
+  257    async switch2fa(@Param('id') id: number, @Res() res: ExpressResponse) {
+  258:     //console.log(`usersService.switch2fa() -> ${id}`);
+  259      const user = await this.usersService.switch2fa(id);
+
+backend/src/users/users.service.ts:
+   27    async signUp42(login: string, imageUrl: string): Promise<any | null> {
+   28:     ////console.log(`users.service: signUp(${user.login})`);
+   29      await axios
+
+   46        .catch((err) => {
+   47:         //console.log(err);
+   48          return err;
+
+   53    async displayAll() {
+   54:     ////console.log(`users.service: displayAll(userRepository)`);
+   55      return await this.userRepository.find().catch((err) => {
+   56:       //console.log(err);
+   57      });
+
+   60    async clear() {
+   61:     ////console.log(`users.service: clear(userRepository)`);
+   62      return await this.userRepository.clear();
+
+  106    ): Promise<UserIdDto | null> {
+  107:     ////console.log(`users.service: uploadFile(${id} -> ${filename})`);
+  108      const user = await this.getById(id);
+
+  122    async getById(id: number): Promise<User | null> {
+  123:     ////console.log(`users.service: getByid(${id})`);
+  124      if (typeof id !== 'number' || isNaN(id)) {
+  125:       //console.log(typeof id);
+  126        return null;
+
+  128      const user = await this.userRepository.findOneBy({ id }).catch((err) => {
+  129:       //console.log(err);
+  130        return err;
+
+  136    async signUp(user: SignDto): Promise<any | null> {
+  137:     ////console.log(`users.service: signUp(${user.login})`);
+  138      const salt = bcrypt.genSaltSync();
+
+  155    async signIn(user: loginDto): Promise<UserResponseDto | null> {
+  156:     ////console.log(`users.service: signIn(${user.login})`);
+  157      const { login } = user;
+
+  179    async blockUser(data: UserRelationDto): Promise<UserResponseDto | null> {
+  180:     ////console.log(`users.service: blockUser(${data.target})`);
+  181      const user = await this.getById(data.id);
+
+  203    ): Promise<User | null> {
+  204:     //console.log(`users.service: addToMatchHistory(${UserLogin})`);
+  205      const user = await this.getByLogin(UserLogin);
+  206      if (user) {
+  207:       //console.log(matchData);
+  208        const newItem = new MatchHistoryDto();
+
+  228    ): Promise<(MatchHistoryDto[] | null)[][] | null> {
+  229:     ////console.log(`users.service: getMatchHistory(${userData.id})`);
+  230      const user = await this.getById(userData.id);
+
+  287        if (user) {
+  288:         //console.log(user.login + ' ' + newStatus);
+  289          user.status = newStatus;
+
+  296      } catch (err) {
+  297:       //console.log(err);
+  298        return null;
+
+  425          user.has2fa = true;
+  426:         //console.log(`usersService.switch2fa(true) -> ${id}`);
+  427        } else {
+  428          user.has2fa = false;
+  429:         //console.log(`usersService.switch2fa(false) -> ${id}`);
+  430        }
+
+frontend/build/static/js/main.c51830a0.js:
+  1  /*! For license information please see main.c51830a0.js.LICENSE.txt */
+  2: ⟪ 442485 characters skipped ⟫n Gf(t,e),t}(Error);function gd(e,t){if(!e)throw new yd(t)}var bd=["debug","log","warn","error","silent"],wd=bd.indexOf("log");function xd(e){return function(){if(bd.indexOf(e)>=wd)return(console[e]||//console.log).apply(console,arguments)}}!function(e){e.debug=xd("debug"),e.log=xd("log"),e.warn=xd("warn"),e.error=xd("error")}(gd||(gd={}));function kd(e){try{return e()}catch(rd){}}var Sd=kd((function(){return globalThis}))||kd((function(){return window}))||kd((function(){return self}))||kd((function(){return global}))||kd((function(){return kd.constructor("return this")()})),Od="__",Ed=[Od,Od].join("DEV");var _d=function(){try{return Boolean(__DEV__)}catch(rd){return Object.defineProperty(Sd,Ed,{value:"production"!==kd((function(){return"production"})),enumerable:!1,configurable:!0,writable:!0}),Sd[Ed]}}();function Cd(e){try{return e()}catch(Gu){}}var Td=Cd((function(){return globalThis}))||Cd((function(){return window}))||Cd((function(){return self}))||Cd((function(){return global}))||Cd((function(){return Cd.constructor("return this")()})),Pd=!1;function Nd(){Pd&&(delete Td.process,Pd=!1)}!Td||Cd((function(){return"production"}))||Cd((function(){return process}))||(Object.definePro⟪ 228867 characters skipped ⟫ata,pb.success("Group as been created",{position:"top-center",autoClose:5e3,hideProgressBar:!1,closeOnClick:!0,pauseOnHover:!0,draggable:!0,progress:void 0,theme:"colored"}),n()})).catch((function(e){//console.log(e),""===a&&pb.error("Missing group name!",{position:"top-center",autoClose:5e3,hideProgressBar:!1,closeOnClick:!0,pauseOnHover:!0,draggable:!0,progress:void 0,theme:"colored"})}))},children:"Add"}),(0,vt.jsx)(ib,{position:"top-center",autoClose:5e3,hideProgressBar:!1,newestOnTop:!1,closeOnClick:!0,rtl:!1,pauseOnFocusLoss:!0,draggable:!0,pauseOnHover:!0,theme:"colored"})]})};function DS(e){if(null==e)throw new TypeError("Cannot destructure "+e)}var MS=!1,AS=r.useSyncExternalStore||function(e,n,r){var i=n();__DEV__&&!MS&&i!==n()&&(MS=!0,__DEV__&&gd.error("The result of getSnapshot should be cached to avoid an infinite loop"));var o=t.useState({inst:{value:i,getSnapshot:n}}),a=o[0].inst,s=o[1];return Gd?t.useLayoutEffect((function(){Object.assign(a,{value:i,getSnapshot:n}),LS(a)&&s({inst:a})}),[e,i,n]):Object.assign(a,{value:i,getSnapshot:n}),t.useEffect((function(){return LS(a)&&s({inst:a}),e((function(){LS(a)&&s({inst:a})}))}),[e]),i};function LS(e){var t=e.value,n=e.getSnap⟪ 153749 characters skipped ⟫=r.queryKey),n.socket(r.path,t)}Object.assign(cR,{Manager:uR,Socket:aR,io:cR,connect:cR});var fR=cR("http://localhost:3002",{extraHeaders:function(){var e=sessionStorage.getItem("currentUser");return //console.log("Res = "+e),e?{Authorization:document.cookie}:{}}()}),dR=t.createContext(void 0);function hR(e){return Dg({tag:"svg",attr:{viewBox:"0 0 512 512"},child:[{tag:"circle",attr:{cx:"256",cy:"256",r:"64"}},{tag:"path",attr:{d:"M394.82 141.18C351.1 111.2 304.31 96 255.76 96c-43.69 0-86.28 13-126.59 38.48C88.52 160.23 48.67 207 16 256c26.42 44 62.56 89.24 100.2 115.18C159.38 400.92 206.33 416 255.76 416c49 0 95.85-15.07 139.3-44.79C433.31 345 469.71 299.82 496 256c-26.38-43.43-62.9-88.56-101.18-114.82zM256 352a96 96 0 1196-96 96.11 96.11 0 01-96 96z"}}]})(e)}var pR=function(e){var n=Object.assign({},(DS(e),e)),r=(n.subscribeToNewMessage,n.chat),i=n.refetch,o=(0,t.useState)([]),s=(0,l.Z)(o,2),c=s[0],f=s[1],d=(0,t.useState)(0),h=(0,l.Z)(d,2),p=h[0],v=h[1],m=(0,t.useState)(""),y=(0,l.Z)(m,2),g=y[0],b=y[1],w=(0,t.useState)(!1),x=(0,l.Z)(w,2),k=x[0],S=x[1],O=(0,t.useState)(""),E=(0,l.Z)(O,2),_=E[0],C=E[1],T=(0,t.useState)(!1),P=(0,l.Z)(T,2),N=(P[0],P[1]),j=Yf(CS),R=Yf(TS),I=Ee(),D=(0,t.⟪ 276 characters skipped ⟫atar:null,pseudo:o.pseudo},e.prev=6,e.next=9,eu.get("http://localhost:3001/app/users/avatar/".concat(o.login));case 9:u=e.sent,s.avatar=u.data.avatar,e.next=16;break;case 13:e.prev=13,e.t0=e.catch(6),//console.log(e.t0);case 16:r.push(s);case 17:i++,e.next=3;break;case 20:f(r);case 21:case"end":return e.stop()}}),e,null,[[6,13]])})));return function(t){return e.apply(this,arguments)}}()}),L=A.loading,z=A.error,F=FS(_g,{variables:{userID:R}}),B=F.data,Z=F.refetch,U=Jd(Sg,{onCompleted:function(){var e=u(a().mark((function e(t){return a().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:i();case 1:case"end":return e.stop()}}),e)})));return function(t){return e.apply(this,arguments)}}()}),V=((0,l.Z)(U,1)[0],Jd(kg,{onCompleted:function(){var e=u(a().mark((function e(t){return a().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:i();case 1:case"end":return e.stop()}}),e)})));return function(t){return e.apply(this,arguments)}}()})),W=(0,l.Z)(V,1)[0],q=Jd(wg,{onCompleted:function(){var e=u(a().mark((function e(t){return a().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:i();case 1:case"end":return e.stop()}}),e)})));return function(t){return e.apply(this,arguments)}}()}),H=(⟪ 5599 characters skipped ⟫ur friend",{position:"top-center",autoClose:5e3,hideProgressBar:!1,closeOnClick:!0,pauseOnHover:!0,draggable:!0,progress:void 0,theme:"colored"});var t=e.login,n=sessionStorage.getItem("currentUser");//console.log("Sending invite from player ".concat(n," to ").concat(t)),eu.get("http://localhost:3001/app/users/invite/".concat(n,"/").concat(t))},children:(0,vt.jsx)(eC,{size:20,color:"Green"})}),(0,vt.jsx)(Yh,{children:"Add to friend"})]})]})]})},t)}))}),"private"===j.type&&(0,vt.jsx)(Jm,{style:{marginLeft:10},onClick:function(){N(!0)},children:"Add user"}),(0,vt.jsx)(ib,{position:"top-center",autoClose:5e3,hideProgressBar:!1,newestOnTop:!1,closeOnClick:!0,rtl:!1,pauseOnFocusLoss:!0,draggable:!0,pauseOnHover:!0,theme:"colored"})]})},vR=fo((function(e,t){var n=t.spacing;return{root:{display:"flex",flexDirection:"column",alignItems:t.align,justifyContent:t.justify,gap:e.fn.size({size:n,sizes:e.spacing})}}})),mR=vR,yR=Object.defineProperty,gR=Object.getOwnPropertySymbols,bR=Object.prototype.hasOwnProperty,wR=Object.prototype.propertyIsEnumerable,xR=function(e,t,n){return t in e?yR(e,t,{enumerable:!0,configurable:!0,writable:!0,value:n}):e[t]=n},kR={spacing:"md",align:"stretch",justify:"fl⟪ 4067 characters skipped ⟫=e.next){case 0:return e.prev=0,e.next=3,eu.get("http://localhost:3001/app/users/avatar/".concat(t));case 3:n=e.sent,(r=We({},f))[t]=n.data.avatar,d(r),e.next=12;break;case 9:e.prev=9,e.t0=e.catch(0),//console.log(e.t0);case 12:case"end":return e.stop()}}),e,null,[[0,9]])})))).apply(this,arguments)}function S(e){return!f[e]&&function(e){k.apply(this,arguments)}(e),f[e]?f[e]:null}var O=o.getMute.find((function(e){return e.login===p}));return(0,vt.jsxs)("div",{children:[r[0]?(0,vt.jsxs)(EE,{style:{height:450},scrollbarSize:0,children:[r.map((function(e,t){return(0,vt.jsx)("div",{id:"id"+t,className:"message",style:y.getByLogin.blackList.includes(e.userID)?{filter:"blur(3px)"}:{filter:"blur(0px)"},children:e.userID===p?(0,vt.jsxs)(vt.Fragment,{children:[(0,vt.jsx)(G_,{size:40,color:"blue",src:"data:image/jpeg;base64,".concat(v)}),(0,vt.jsx)("div",{className:"text",children:(0,vt.jsx)("p",{children:e.message})})]}):(0,vt.jsxs)(vt.Fragment,{children:[(0,vt.jsx)("div",{className:"text",children:(0,vt.jsx)("p",{children:e.message})}),(0,vt.jsx)(G_,{size:40,color:"blue",src:"data:image/jpeg;base64,".concat(S(e.userID))})]})},t)})),(0,vt.jsx)("div",{ref:w})]}):(0,vt.jsx)(Yh,{c:"dimmed",size:1⟪ 426 characters skipped ⟫nHover:!0,theme:"colored"})]})},RR=function(e){var n=Object.assign({},(DS(e),e)).setShowMessages,r=(0,t.useState)(!1),i=(0,l.Z)(r,2),o=i[0],a=i[1],s=Yf(CS);Yf(TS);var u=FS(Tg,{onCompleted:function(e){//console.log(e)},variables:{uuid:s.uuid},fetchPolicy:"network-only"}),f=u.loading,d=u.error,h=u.data,p=u.subscribeToMore,v=u.refetch;if(f)return(0,vt.jsx)(vt.Fragment,{children:"Loading..."});if(d)return(0,vt.jsx)(vt.Fragment,{children:"ERROR"});var m=function(){p({document:Og,variables:{uuid:s.uuid},updateQuery:function(e,t){var n=t.subscriptionData;if(!n.data)return e;var r=n.data.messageAdded;return Object.assign({},e,{chats:{getMessages:[].concat((0,c.Z)(e.chats.getMessages),[r]),getMute:e.chats.getMute,getBan:e.chats.getBan,muteID:e.chats.muteID,adminID:e.chats.adminID,userID:e.chats.userID,ownerID:e.chats.ownerID,uuid:e.chats.uuid,index:e.chats.index+1,name:e.chats.name,type:e.chats.type}})}})};return(0,vt.jsx)(vt.Fragment,{children:(0,vt.jsxs)("div",{children:[(0,vt.jsxs)("div",{className:"top-bar",children:[(0,vt.jsx)(Nf,{onClick:function(){return n(!1)},children:(0,vt.jsx)(Ag,{})}),(0,vt.jsx)("h4",{className:"title",children:s.name}),(0,vt.jsx)(Nf,{onClick:function(){a(!o)},chi⟪ 4433 characters skipped ⟫ion E(){p((function(e){return!e}))}function _(){c((function(e){return!e}))}var C=Jd(gg,{onCompleted:function(){o()}}),T=(0,l.Z)(C,1)[0],P=FS(_g,{variables:{userID:O}});P.data,P.loading,P.error;return //console.log(),(0,vt.jsxs)("div",{className:"py-3 px-5",children:[(0,vt.jsx)(UN,{open:h,onClose:function(){return p(!1)},position:"top center",modal:!0,nested:!0,children:(0,vt.jsx)(DR,{togglePassword:E,toggleShowMessages:_,uuid:S.uuid})}),(0,vt.jsx)(UN,{open:y,onClose:function(){return g(!1)},position:"top center",modal:!0,nested:!0,children:(0,vt.jsx)(MR,{toggleEdit:function(){g((function(e){return!e}))},refetch:o})}),(0,vt.jsx)(UN,{open:x,onClose:function(){return k(!1)},position:"top center",modal:!0,nested:!0,children:(0,vt.jsx)(AR,{toggleShow:function(){k((function(e){return!e}))}})}),u?(0,vt.jsx)(RR,{setShowMessages:c,chat_list:i}):(0,vt.jsxs)(vt.Fragment,{children:[(0,vt.jsx)(tC,{}),(0,vt.jsxs)(EE,{style:{height:450,paddingTop:10},scrollbarSize:5,offsetScrollbars:!0,children:[(0,vt.jsx)("h4",{children:"public"}),(0,vt.jsx)(FE,{my:"sm"}),i&&i.aliveChats.filter((function(e){return"public"===e.type})).map((function(e){return(0,vt.jsx)("div",{style:{padding:"5px"},children:(0,vt.jsx⟪ 41772 characters skipped ⟫rofile"})}}),(0,vt.jsx)(Wl.Item,{children:function(e){var t=e.active;return(0,vt.jsx)("div",{style:{cursor:"pointer"},children:(0,vt.jsx)("a",{id:"headlessui-menu-item-:r4:",onClick:function(){return //console.log("Disconnect"),i("/"),sessionStorage.clear(),void window.location.reload()},className:eM(t?"bg-gray-100":"","block px-4 py-2 text-sm text-red-700 nav-link"),children:"Sign out"})})}})]})})]})})]})}),(0,vt.jsx)(ol.Panel,{className:"sm:hidden",children:(0,vt.jsx)("div",{className:"space-y-1 px-2 pt-2 pb-3",children:JD.map((function(e){return(0,vt.jsx)(ol.Button,{as:"a",href:e.href,className:eM(e.current?"bg-gray-900 text-white":"text-gray-300 hover:bg-gray-700 hover:text-white","block px-3 py-2 rounded-md text-base font-medium"),"aria-current":e.current?"page":void 0,children:e.name},e.name)}))})})]})}}),(0,vt.jsx)(XD,{})]})};var nM=function(){return(0,vt.jsxs)("div",{children:[(0,vt.jsx)(tM,{}),(0,vt.jsxs)(va,{shadow:"sm",p:"lg",radius:"md",className:"card",withBorder:!0,children:[(0,vt.jsx)("h1",{className:"card-title text-center",children:"Leaderboard"}),(0,vt.jsx)(tu,{})]})]})};var rM=function(){var e=(0,t.useContext)(dR),n=Ee();return e&&e.on("Test",(function(){n("/Discon⟪ 4567 characters skipped ⟫eight:e.CDimension.height}}}]),e}();function fM(){var e,n=(0,t.useContext)(dR),r=(0,t.useRef)(null),i=new cM(1920,1080),o={width:1920,height:1080},a=t.useState(!1),s=(0,l.Z)(a,2),u=s[0],c=s[1];return //console.log("Gaming"),(0,t.useEffect)((function(){var t,a;function s(e,t){a.fillStyle="#000000",a.fillRect(0,0,a.canvas.width,a.canvas.height),l(t.width/4,t.height/4,"#ffffff",e.Player1.score.toString()),l(3*t.width/4,t.height/4,"#ffffff",e.Player2.score.toString()),f(e.Player1.x,e.Player1.y,e.Player1.width,e.Player1.height,e.Player1.color),f(e.Player2.x,e.Player2.y,e.Player2.width,e.Player2.height,e.Player2.color),function(e,t,n,r){a.fillStyle=r,a.beginPath(),a.arc(e,t,n,0,2*Math.PI,!1),a.closePath(),a.fill()}(e.Balling.x,e.Balling.y,e.Balling.radius,e.Balling.color)}function l(e,t,n,r){a.fillStyle=n,a.font="45px Arial",a.fillText(r,e,t)}function f(e,t,n,r,i){a.fillStyle=i,a.fillRect(e,t,n,r)}return n.on("Ping",(function(t){e=t})),n.on("GameEnd",(function(){//console.log("Disconnected"),c(!0)})),n.emit("Ping",(function(e){e||c(!0)})),r.current&&((t=r.current).width=1920,t.height=1080,(a=t.getContext("2d"))&&(a.beginPath(),a.fillStyle="#000000",a.fillRect(0,0,a.canvas.width,a.canvas.height)),t.tabIndex=1,window.addEventListener("keydown",(function(e){e.repeat||("ArrowUp"===e.key&&n.emit("PaddleUp",!0),"ArrowDown"===e.key&&n.emit("PaddleDown",!0))})),window.addEventListener("keyup",(function(e){e.repeat||("ArrowUp"===e.key&&n.emit("PaddleUp",!1),"ArrowDown"===e.key&&n.emit("PaddleDown",!1))}))),function t(){e&&!1===e.Running||(e||u||s(i,o),e&&s(e,o),requestAnimationFrame(t))}(),e&&!1===e.Running&&//console.log("Game not running"),function(){n.off("Ping"),n.off("GameEnd")}}),[u]),//console.log(u),(0,vt.jsxs)("div",{children:[!u&&(0,vt.jsx)("canvas",{ref:r,id:"responsive-canvas"}),u&&(0,vt.jsx)(sM,{})]})}var dM=function(){var e=(0,t.useContext)(dR),n=(0,t.useState)(!1),r=(0,l.Z)(n,2),i=r[0],o=r[1],a=(0,t.useState)(!1),s=(0,l.Z)(a,2),u=s[0],c=s[1],f=(0,t.useState)(null),d=(0,l.Z)(f,2),h=d[0],p=d[1],v=(0,t.useState)(!1),m=(0,l.Z)(v,2),y=m[0],g=(m[1],Ee(),function(){e.emit("PlayerReady")});function b(){return(0,vt.jsxs)("div",{children:[(0,vt.jsx)(tM,{}),(0,vt.jsx)(fM,{}),(0,vt.jsx)("div",{className:"flex-item",children:(0,vt.jsx)("div",{className:"mc-menu",children:(0,vt.jsx)("div",{className:"mc-button full",children:(0,vt.jsx)("button",{className:"title",onClick:g,children:"IM FUCKING READY"})})})})]})}return(0,t.useEffect)((function(){return e.on("GameLost",(function(e){c(!0),p(e),o(!1)})),e.on("GameWon",(function(e){c(!1),p(e),o(!0)})),e.on("EndGame",(function(){e.emit("EndGame")})),function(){e.off("GameWon"),e.off("GameLost"),e.off("EndGame")}}),[i,u,h,y]),(0,⟪ 1568 characters skipped ⟫=(0,t.useContext)(dR),n=(0,t.useState)(!1),r=(0,l.Z)(n,2),i=r[0],o=r[1],a=(0,t.useState)(null),s=(0,l.Z)(a,2),u=s[0],c=s[1];return(0,t.useEffect)((function(){return e.on("SpectateResult",(function(e){//console.log("end"),o(!0),c(e),//console.log(e)})),function(){e.off("SpectateResult")}}),[i,u]),(0,vt.jsxs)("div",{children:[!i&&(0,vt.jsx)(wM,{}),i&&(0,vt.jsx)(aM,{Winner:u.Winner,Loser:u.Loser,scoreX:u.scoreX,scoreY:u.scoreY,date:u.date})]})},kM=function(){return(0,vt.jsxs)("div",{children:[(0,vt.jsx)(tM,{}),(0,vt.jsx)("div",{className:"flex-container",children:(0,vt.jsxs)("div",{className:"mc-menu",children:[(0,vt.jsx)("div",{className:"mc-button full",children:(0,vt.jsx)($t.Link,{as:nn,to:"/Lobby",className:"title",children:"Play"})}),(0,vt.jsx)("div",{className:"mc-button full",children:(0,vt.jsx)($t.Link,{as:nn,to:"/Profile",className:"title",children:"Profile"})}),(0,vt.jsx)("div",{className:"mc-button full",children:(0,vt.jsx)($t.Link,{as:nn,to:"/Community",className:"title",children:"Friend List"})})]})})]})},SM=function(e){return e.errors&&0!==e.errors.length?(0,vt.jsx)("div",{children:(0,vt.jsx)("ul",{style:{listStyle:"none"},children:e.errors&&e.errors.length>0&&e.errors.map((function(e){return(0,vt.jsx)("⟪ 1173 characters skipped ⟫function(e){for(;;)switch(e.prev=e.next){case 0:return t.preventDefault(),e.next=3,eu.get("http://localhost:3001/app/users/switch2fa/".concat(sessionStorage.getItem("currentUser"))).then((function(e){//console.log(e.data),i(!r)})).catch((function(e){console.error(e.response.data)}));case 3:case"end":return e.stop()}}),e)})));return function(t){return e.apply(this,arguments)}}();return(0,vt.jsx)("div",{className:"center",children:(0,vt.jsx)("div",{style:{color:"white"},children:(0,vt.jsx)("button",{className:"mc-button fa",onClick:o,children:r?"Disable 2FA":"Enable 2FA"})})})},_M=function(){var e=(0,t.useState)(),n=(0,l.Z)(e,2),r=n[0],i=n[1],o=(0,t.useState)(),s=(0,l.Z)(o,2),c=s[0],f=(s[1],(0,t.useState)()),d=(0,l.Z)(f,2),h=(d[0],d[1]),p=(0,t.useState)(),v=(0,l.Z)(p,2),m=v[0],y=v[1],g=(0,t.useState)(),b=(0,l.Z)(g,2),w=b[0],x=b[1];(0,t.useEffect)((function(){var e=function(){var e=u(a().mark((function e(){return a().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,eu.get("http://localhost:3001/app/users/profile/".concat(sessionStorage.getItem("currentUser"))).then((function(e){i(e.data.avatar)})).catch((function(e){console.error(e.response.data),y(e.response.data)}));case 2:case"end":return e.stop()}}),e)})));return function(){return e.apply(this,arguments)}}(),t=function(){var e=u(a().mark((function e(){var t;return a().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return t={id:Number.parseInt(sessionStorage.getItem("currentUser")),login:c},e.next=3,eu.post("http://localhost:3001/app/users/profile",t).then((function(e){y(null),i(e.data.avatar),//console.log("this is player data",e.data),x(e.data)})).catch((function(e){console.error(e.response.data),y(e.response.data)}));case 3:case"end":return e.stop()}}),e)})));return function(){return e.apply(this,arguments)}}();r||e(),w||t()}),[]);var k=function(){var e=u(a().mark((function e(t){var n,r,o;return a().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return r=null===(n=t.target.files)||void 0===n?void 0:n[0],h(r),(o=new FormData).append("user",sessionStorage.getItem("currentUser")),o.append("file",r),e.next=7,eu.post("http://localhost:3001/app/users/avatar",o).then((function(e){var t;i(null===(t=e.data)||void 0===t?void 0:t.avatar)})).catch((function(e){//console.log(e.response.data),y(e.response.data)}));case 7:case"end":return e.stop()}}),e)})));return function(t){return e.apply(this,arguments)}}();return void 0===w?(0,vt.jsx)("div",{children:"Loading..."}):(0,vt.jsxs)(va,{shadow:"sm",p:"lg",radius:"md",className:"card",withBorder:!0,children:[(0,vt.jsx)("h1",{className:"card-title text-center",children:"Profile"}),(0,vt.jsxs)("div",{className:"card-profile",children:[(0,vt.jsxs)("div",{className:"profile-pic",children:[(0,vt.jsx)("label",{className:"-label",htmlFor:"file",children:(0,vt.jsx)($_,{className:"edit-icon-react"})}),(0,vt.jsx)("input",{id:"file",type:"file",onChange:k}),(0,vt.jsx)("img",{alt:"avatar",src:"data:image/jpeg;base64,".concat(r),id:"output",width:"200"})]}),(0,vt.jsx)("div",{className:"user-info",children:(0,vt.jsx)("h2",{children:w.pseudo})})]}),(0,vt.jsx)("ul",{className:"match-list",children:(0,vt.jsx)(OM,{})}),(0,vt.jsx)("div",{children:(0,vt.jsx)(EM,{})}),(0,vt.jsx)(SM,{errors:m})]})};var CM=function(){retu⟪ 2246 characters skipped ⟫,f=s[1],d=(0,t.useState)(),h=(0,l.Z)(d,2),p=h[0],v=(h[1],Ee()),m=function(){var e=u(a().mark((function e(t){var n,r;return a().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:t.preventDefault(),//console.log(),n=new FormData(t.currentTarget),r={login:n.get("login"),password:n.get("password")},eu.post("http://localhost:3001/app/auth/signin",r,{headers:{}}).then((function(e){//console.log("response = ",e),document.cookie=e.data.cookie,//console.log("token = ",e.data.cookie),sessionStorage.setItem("currentUser",e.data.user.id),//console.log(e.data.fLog),e.data.user.has2fa?v("/Code2FA"):e.data.fLog?v("/FirstLog"):v("/CoPage"),window.location.reload()})).catch((function(e){SF("Invalid credentials")}));case 5:case"end":return e.stop()}}),e)})));return function(t){return e.apply(this,arguments)}}();return(0,vt.jsxs)("div",{children:[(0,vt.jsx)(TM.ReactNotifications,{}),(0,vt.jsx)("div",{className:"flex-container",children:(0,vt.jsxs)("div",{children:[(0,vt.jsx)("h1",{className:"text-center",children:"SIGNIN"}),(0,vt.jsxs)("form",{onSubmit:m,children:[(0,vt.jsxs)("div",{className:"mc-menu",children:[(0,vt.jsx)("input",{className:"mc-button full",required:!0,type:"text",name:"login",placeholder:"login",value:r,onChange:function(e){return i(e.target.value)}}),(0,vt.jsx)("input",{className:"mc-button full",required:!0,type:"password",name:"password",placeholder:"password",value:c,onChange:function(e){return f(e.target.value)}}),(0,vt.jsx)("button",{className:"mc-button test",children:"SUBMIT"})]}),(0,vt.jsx)("div",{cl⟪ 314 characters skipped ⟫lex-container",children:(0,vt.jsxs)("div",{className:"mc-menu",children:[(0,vt.jsx)("div",{className:"mc-button full",children:(0,vt.jsx)($t.Link,{onClick:function(){e.emit("CreateLobby",(function(e){//console.log(e),kF(e)}))},className:"title",children:"Create classic Lobby"})}),(0,vt.jsx)("div",{className:"mc-button full",children:(0,vt.jsx)($t.Link,{onClick:function(){e.emit("CreateRainbowLobby",(function(e){kF(e)}))},className:"title",children:"Create Rainbow Day Lobby"})}),(0,vt.jsx)("div",{className:"mc-button full",children:(0,vt.jsx)($t.Link,{onClick:function(){e.emit("LobbyInfo")},className:"title",children:"Print Lobby"})})]})})]})};var DM=function(){return(0,t.useContext)(dR),Ee(),(0,vt.jsxs)("div",{children:[(0,vt.jsx)(TM.ReactNotifications,{}),(0,vt.jsx)(kM,{})]})};var MM=function(){return(0,vt.jsx)("div",{children:(0,vt.jsx)("h1",{children:"Settings"})})};var AM=function(){return(0,vt.jsxs)("div",{children:[(0,vt.jsx)(tM,{}),(0,vt.jsxs)(va,{shadow:"sm",p:"lg",radius:"md",className:"card",withBorder:!0,children:[(0,vt.jsx)("h1",{className:"card-title text-center",children:"Match History"}),(0,vt.jsx)(OM,{})]})]})};function LM(){var e=(0,t.useState)(""),n=(0,l.Z)(e,2),r=n⟪ 2904 characters skipped ⟫rror(e.response.data)}));case 3:case"end":return e.stop()}}),e)})));return function(){return e.apply(this,arguments)}}();r||e(),c||t()}),[r,c,d]),void 0===c?(0,vt.jsx)("div",{children:"Loading..."}):(//console.log(c),(0,vt.jsxs)(va,{shadow:"sm",p:"lg",radius:"md",className:"card",withBorder:!0,children:[(0,vt.jsx)("h1",{className:"card-title text-center",children:"Profile"}),(0,vt.jsxs)("div",{className:"card-profile",children:[(0,vt.jsx)("div",{className:"profile-pic",children:(0,vt.jsx)("div",{className:"-label",children:(0,vt.jsx)("img",{src:"data:image/jpeg;base64,".concat(r),id:"output",width:"200"})})}),(0,vt.jsx)("div",{className:"user-info",children:(0,vt.jsxs)("h2",{children:[c.pseudo," ","online"===c.status?(0,vt.jsx)(FM,{children:" Online "}):(0,vt.jsx)(BM,{color:"red",children:" Offline "})]})})]})]}))};var UM=function(e){return(0,vt.jsxs)("div",{children:[(0,vt.jsx)(tM,{}),(0,vt.jsx)(ZM,{})]})},VM=Object.defineProperty,WM=Object.defineProperties,qM=Object.getOwnPropertyDescriptors,HM=Object.getOwnPropertySymbols,YM=Object.prototype.hasOwnProperty,QM=Object.prototype.propertyIsEnumerable,GM=function(e,t,n){return t in e?VM(e,t,{enumerable:!0,configurable:!0,writable:!0,va⟪ 4551 characters skipped ⟫on(t){for(;;)switch(t.prev=t.next){case 0:return t.next=2,eu.get("http://localhost:3001/app/users/remove/".concat(sessionStorage.getItem("currentUser"),"/").concat(e.login)).catch((function(e){return //console.log(e)})).then((function(){return window.location.reload()}));case 2:case"end":return t.stop()}}),t)}))),children:"Remove / Unfriend"})]})},e.id)}));//console.log(c);var m=c.map((function(e){return(0,vt.jsx)("tr",{children:(0,vt.jsxs)("td",{className:"friend",children:[(0,vt.jsx)(G_,{src:"data:image/jpeg;base64,".concat(e.avatar),size:"md"}),e.pseudo," ","online"===e.status?(0,vt.jsx)(FM,{}):(0,vt.jsx)(BM,{color:"red"}),(0,vt.jsx)(Jm,{onClick:u(a().mark((function t(){return a().wrap((function(t){for(;;)switch(t.prev=t.next){case 0:return t.next=2,eu.get("http://localhost:3001/app/users/accept/".concat(sessionStorage.getItem("currentUser"),"/").concat(e.login)).catch((function(e){return //console.log(e)})).then((function(){return window.location.reload()}));case 2:p({variables:{newChat:{name:e.pseudo,type:"dm",password:"",ownerID:e.login,userID:[d,e.login]}}});case 3:case"end":return t.stop()}}),t)}))),children:"Accept"}),(0,vt.jsx)(Jm,{onClick:u(a().mark((function t(){return a().wrap((function(t){for(;;)switch(t.prev=t.next){case 0:return t.next=2,eu.get("http://localhost:3001/app/users/decline/".concat(sessionStorage.getItem("currentUser"),"/").concat(e.login)).catch((function(e){return //console.log(e)})).then((function(){return window.location.reload()}));case 2:case"end":return t.stop()}}),t)}))),children:"Decline"})]})},e.id)}));return(0,vt.jsxs)("div",{children:[(0,vt.jsx)(EE,{h:600,children:(0,vt.jsxs)(uA,{miw:700,children:[(0,vt.jsx)("thead",{children:(0,vt.jsx)("tr",{children:(0,vt.jsx)("th",{children:"Friend"})})}),(0,vt.jsx)("tbody",{children:v})]})}),(0,vt.jsx)(EE,{h:200,children:(0,vt.jsxs)(uA,{miw:700,children:[(0,vt.jsx)("thead",{children:(0,vt.jsx)("tr",{children:(0,vt.jsx)("th",{children:"Request"})})}),(0,vt.jsx)("tbody",{children:m})]})})]})};var cA=function(){return(0,vt.jsxs)("div",{children:[(0,vt.jsx)(tM,{}),(0,vt.jsxs)(va,{shadow:"sm",p:"lg",radius:"md",className:"card",withBorder:!0,children:[(0,vt.jsx)("h1",{className:"card-title text-center",children:"Friends"}),(0,vt.jsx)(lA,{})]})]})},fA=function(){var e=(0,t.useState)(""),n=(0,l.Z)(e,2),r=n[0],i=n[1],o=(0,t.useState)(),s=(0,l.Z)(o,2),c=s[0],f=(s[1],Ee()),d=function(){var e=u(a().mark((function e(t){var n,r;return a().wrap((function(e){for(;;)switch(e.prev=e.next){case 0:t.preventDefault(),n=new FormData(t.currentTarget),r={code:n.get("code")},eu.post("http://localhost:3001/app/auth/code/".concat(sessionStorage.getItem("currentUser")),r,{headers:{Authorization:document.cookie}}).then((function(e){//console.log(e),f("/CoPage")})).catch((function(e){//console.log(e),f("/Code2FA"),SF("Invalid code")}));case 4:case"end":return e.stop()}}),e)})));return function(t){return e.apply(this,arguments)}}();return(0,vt.jsx)("div",{children:(0,vt.jsx)("div",{className:"flex-container",children:(0,vt.jsxs)("div",{children:[(0,vt.jsx)("h1",{className:"text-center",children:"2FA CHECK"}),(0,vt.jsxs)("form",{onSubmit:d,children:[(0,vt.jsx)("div",{className:"mc-menu",children:(0,vt.jsx)("input",{className:"mc-button full",type:"text",name:"code",placeholder:"code",value:r,onChange:function(e){return i(e.target.value)}})}),(0,vt.jsx)("button",{className:"mc-button full ",type:"submit",children:"SUBMIT"}),(0,vt.jsx)("div",{className:"text-center",children:(0,vt.jsx)(SM,{errors:c})})]})]})})})};var dA=function(){return(0,vt.jsx)("div",{children:(0,vt.jsx)(fA,{})})};var hA=function(){return(0,vt.jsxs)(ze,{children:[(0,vt.jsx)(Ae,{path:"/Game",element:(0,vt.jsx)(dM,{})}),(0,vt.jsx)(Ae,{path:"/CoPage",element:(0,vt.jsx)(DM,{})}),(0,vt.jsx)(Ae,{path:"/",el⟪ 111915 characters skipped ⟫Ee(),m=(0,t.useContext)(dR);function y(){a(),m.emit("RefuseInvite",c)}return(0,t.useEffect)((function(){return m.on("Waiting Room",(function(){v("/RoomWaiting")})),m.on("AlreadyConnected",(function(){//console.log("Disconnect"),v("/")})),m.on("Ready",(function(){v("/Game")})),m.on("InviteToGame",(function(e){p(!0),f(e),o()})),m.on("RefuseToGame",(function(e){p(!1),f(""),SF("".concat(e," refuse to play with you")),v("/HomePage")})),m.on("SpectateReady",(function(){v("/Spectate")})),m.on("RemovePlayer",(function(){document.cookie="",sessionStorage.removeItem("currentUser"),v("/")})),m.on("Berror",(function(e){SF(e)})),function(){m.off("Waiting Room"),m.off("InviteToGame"),m.off("RefuseToGame"),m.off("Ready"),m.off("SpectateReady"),m.off("AlreadyConnected")}}),[]),(0,vt.jsx)("div",{children:(0,vt.jsxs)(wF,{opened:r,onClose:function(){return y()},size:"auto",title:"Invitation",centered:!0,closeOnClickOutside:!1,closeOnEscape:!1,withCloseButton:!1,children:[(0,vt.jsx)("title",{children:"Invite"}),(0,vt.jsxs)(Yh,{children:["Do you want to play a game with ",c," ?"]}),(0,vt.jsxs)(GE,{position:"center",mt:"md",children:[(0,vt.jsx)(Jm,{variant:"outline",onClick:function(){a(),m.emit("AcceptIn
+  3  //# sourceMappingURL=main.c51830a0.js.map
+
+frontend/build/static/js/main.c51830a0.js.map:
+  1: ⟪ 2348849 characters skipped ⟫\n *\n * When multiple objects contain the same key the later object in\n * the arguments list will take precedence.\n *\n * Example:\n *\n * ```js\n * var result = merge({foo: 123}, {foo: 456});\n * //console.log(result.foo); // outputs 456\n * ```\n *\n * @param {Object} obj1 Object to merge\n *\n * @returns {Object} Result of all merge properties\n */\nfunction merge(/* obj1, obj2, obj3, ... */) {\n  const {caseless} = isContextDefined(this) && this || {};\n  const result = {};\n  const assignValue = (val, key) => {\n    const targetKey = caseless && findKey(result, key) || key;\n    if (isPlainObject(result[targetKey]) && isPlainObject(val)) {\n      result[targetKey] = merge(result[targetKey], val);\n    } else if (isPlainObject(val)) {\n      result[targetKey] = merge({}, val);\n    } else if (isArray(val)) {\n      result[targetKey] = val.slice();\n    } else {\n      result[targetKey] = val;\n    }\n  }\n\n  for (let i = 0, l = arguments.length; i < l; i++) {\n    arguments[i] && forEach(arguments[i], assignValue);\n  }\n  return result;\n}\n\n/**\n * Extends object a by mutably adding to it the properties of object b.\n *\n * @param {Object} a The object to be extended\n * @⟪ 164037 characters skipped ⟫Levels.indexOf(\"log\");\n\nfunction wrapConsoleMethod<M extends ConsoleMethodName>(name: M) {\n  return function () {\n    if (verbosityLevels.indexOf(name) >= verbosityLevel) {\n      // Default to //console.log if this host environment happens not to provide\n      // all the console.* methods we need.\n      const method = console[name] || //console.log;\n      return method.apply(console, arguments as any);\n    }\n  } as (typeof console)[M];\n}\n\nexport namespace invariant {\n  export const debug = wrapConsoleMethod(\"debug\");\n  export const log = wrapConsoleMethod(\"log\");\n  export const warn = wrapConsoleMethod(\"warn\");\n  export const error = wrapConsoleMethod(\"error\");\n}\n\nexport function setVerbosity(level: VerbosityLevel): VerbosityLevel {\n  const old = verbosityLevels[verbosityLevel];\n  verbosityLevel = Math.max(0, verbosityLevels.indexOf(level));\n  return old;\n}\n\nexport default invariant;\n","export function maybe<T>(thunk: () => T): T | undefined {\n  try { return thunk() } catch {}\n}\n","import { maybe } from \"./maybe\";\n\ndeclare global {\n  // Despite our attempts to reuse the React Native __DEV__ constant instead of\n  // inventing something new and Apollo-specific, declaring a useful type for\n  // __DEV__ unfortunately conflicts (TS2451) with the global declaration in\n  // @types/react⟪ 1214916 characters skipped ⟫k: true,\n        pauseOnHover: true,\n        draggable: true,\n        progress: undefined,\n        theme: \"colored\",\n        });\n      toggleShowCreate()\n    })\n      .catch(e => {\n        //console.log(e);\n        if (groupname === \"\") {\n          toast.error('Missing group name!', {\n            position: \"top-center\",\n            autoClose: 5000,\n            hideProgressBar: false,\n            closeOnClick: true,\n            pauseOnHover: true,\n            draggable: true,\n            progress: undefined,\n            theme: \"colored\",\n            });\n        }\n      })\n  }\n\n\n  return (\n    <Card\n      withBorder\n      sx={{\n        borderRadius: 15,\n      }}\n      style={{\n        padding: 15,\n        position: 'absolute',\n        width: 250\n      }}\n    >\n      <ActionIcon\n        onClick={() => toggleShowCreate()}\n        style={{\n          position: 'absolute',\n          top: 5,\n          right: 5,\n        }}\n      ><IoMdClose size={15}></IoMdClose>\n      </ActionIcon>\n\n      <TextInput\n        withAsterisk\n        label=\"Chat name\"\n        placeholder=\"my chat name..\"\n        onChange={e => setGroupName(e.target.va⟪ 7597077 characters skipped ⟫ * A Socket belongs to a certain Namespace (by default /) and uses an underlying {@link Manager} to communicate.\n *\n * @example\n * const socket = io();\n *\n * socket.on(\"connect\", () => {\n *   //console.log(\"connected\");\n * });\n *\n * // send an event to the server\n * socket.emit(\"foo\", \"bar\");\n *\n * socket.on(\"foobar\", () => {\n *   // an event was received from the server\n * });\n *\n * // upon disconnection\n * socket.on(\"disconnect\", (reason) => {\n *   //console.log(`disconnected due to ${reason}`);\n * });\n */\nexport class Socket extends Emitter {\n    /**\n     * `Socket` constructor.\n     */\n    constructor(io, nsp, opts) {\n        super();\n        /**\n         * Whether the socket is currently connected to the server.\n         *\n         * @example\n         * const socket = io();\n         *\n         * socket.on(\"connect\", () => {\n         *   //console.log(socket.connected); // true\n         * });\n         *\n         * socket.on(\"disconnect\", () => {\n         *   //console.log(socket.connected); // false\n         * });\n         */\n        this.connected = false;\n        /**\n         * Whether the connection state was recovered after a temporary disconnection. In that case, any missed packets will\n         * be transmitted by the server.\n         */\n        this.recovered = false;\n        /**\n         * Buffer for packets received before the CONNECT packet\n         */\n        this.receiveBuffer = [];\n        /**\n         * Buffer for packets that will be sent once the socket is connected\n         */\n        this.sendBuffer = [];\n        /**\n         * The queue of packets to be sent with retry in case of failure.\n         *\n         * Packets are sent one by one, each waiting for the server acknowledgement, in order to guarantee the delivery order.\n         * @private\n         */\n        this._queue = [];\n        /**\n         * A sequence to generate the ID of the {@link QueuedPacket}.\n         * @private\n         */\n  ⟪ 317 characters skipped ⟫       this.open();\n    }\n    /**\n     * Whether the socket is currently disconnected\n     *\n     * @example\n     * const socket = io();\n     *\n     * socket.on(\"connect\", () => {\n     *   //console.log(socket.disconnected); // false\n     * });\n     *\n     * socket.on(\"disconnect\", () => {\n     *   //console.log(socket.disconnected); // true\n     * });\n     */\n    get disconnected() {\n        return !this.connected;\n    }\n    /**\n     * Subscribe to open, close and packet events\n     *\n     * @private\n     */\n    subEvents() {\n        if (this.subs)\n            return;\n        const io = this.io;\n        this.subs = [\n            on(io, \"open\", this.onopen.bind(this)),\n            on(io, \"packet\", this.onpacket.bind(this)),\n            on(io, \"error\", this.onerror.bind(this)),\n            on(io, \"close\", this.onclose.bind(this)),\n        ];\n    }\n    /**\n     * Whether the Socket will try to reconnect when its Manager connects or reconnects.\n     *\n     * @example\n     * const socket = io();\n     *\n     * //console.log(socket.active); // true\n     *\n     * socket.on(\"disconnect\", (reason) => {\n     *   if (reason === \"io server disconnect\") {\n     *     // the disconnection was initiated by the server, you need to manually reconnect\n     *     //console.log(socket.active); // false\n     *   }\n     *   // else the socket will automatically try to reconnect\n     *   //console.log(socket.active); // true\n     * });\n     */\n    get active() {\n        return !!this.subs;\n    }\n    /**\n     * \"Opens\" the socket.\n     *\n     * @example\n     * const socket = io({\n     *   autoConnect: false\n     * });\n     *\n     * socket.connect();\n     */\n    connect() {\n        if (this.connected)\n            return this;\n        this.subEvents();\n        if (!this.io[\"_reconnecting\"])\n            this.io.open(); // ensure open\n        if (\"open\" === this.io._readyState)\n            this.onopen();\n        return this;\n    }\n    /**\n     * Alias for {@link connect()}.\n     */\n    open() {\n        return this.connect();\n    }\n    /**\n     * Sends a `message` event.\n     *\n     * This method mimics the WebSocket.send() method.\n     *\n     * @see https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send\n     *\n     * @example\n     * socket.send(\"hello\");\n     *\n     * // this is equivalent to\n     * socket.emit(\"mes⟪ 12145 characters skipped ⟫et instance of the {@link Manager}, the low-level connection will be closed.\n     *\n     * @example\n     * const socket = io();\n     *\n     * socket.on(\"disconnect\", (reason) => {\n     *   // //console.log(reason); prints \"io client disconnect\"\n     * });\n     *\n     * socket.disconnect();\n     *\n     * @return self\n     */\n    disconnect() {\n        if (this.connected) {\n            this.packet({ type: PacketType.DISCONNECT });\n        }\n        // remove socket from pool\n        this.destroy();\n        if (this.connected) {\n            // fire events\n            this.onclose(\"io client disconnect\");\n        }\n        return this;\n    }\n    /**\n     * Alias for {@link disconnect()}.\n     *\n     * @return self\n     */\n    close() {\n        return this.disconnect();\n    }\n    /**\n     * Sets the compress flag.\n     *\n     * @example\n     * socket.compress(false).emit(\"hello\");\n     *\n     * @param compress - if `true`, compresses the sending data\n     * @return self\n     */\n    compress(compress) {\n        this.flags.compress = compress;\n        return this;\n    }\n    /**\n     * Sets a modifier for a subsequent event emission that⟪ 903 characters skipped ⟫ner that will be fired when any event is emitted. The event name is passed as the first argument to the\n     * callback.\n     *\n     * @example\n     * socket.onAny((event, ...args) => {\n     *   //console.log(`got ${event}`);\n     * });\n     *\n     * @param listener\n     */\n    onAny(listener) {\n        this._anyListeners = this._anyListeners || [];\n        this._anyListeners.push(listener);\n        return this;\n    }\n    /**\n     * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the\n     * callback. The listener is added to the beginning of the listeners array.\n     *\n     * @example\n     * socket.prependAny((event, ...args) => {\n     *   //console.log(`got event ${event}`);\n     * });\n     *\n     * @param listener\n     */\n    prependAny(listener) {\n        this._anyListeners = this._anyListeners || [];\n        this._anyListeners.unshift(listener);\n        return this;\n    }\n    /**\n     * Removes the listener that will be fired when any event is emitted.\n     *\n     * @example\n     * const catchAllListener = (event, ...args) => {\n     *   //console.log(`got event ${event}`);\n     * }\n     *\n     * socket.onAny(catchAllListener);\n     *\n     * // remove a specific listener\n     * socket.offAny(catchAllListener);\n     *\n     * // or remove all listeners\n     * socket.offAny();\n     *\n     * @param listener\n     */\n    offAny(listener) {\n        if (!this._anyListeners) {\n            return this;\n        }\n        if (listener) {\n            const listeners = this._anyListeners;\n            for (let i = 0; i < listeners.length; i++) {\n                if (listener === listeners[i]) {\n                    listeners.splice(i, 1);\n                    return this;\n                }\n            }\n        }\n        else {\n            this._anyListeners = [];\n        }\n        return this;\n    }\n    /**\n     * Returns an array of listeners that are listening for any event that is specified. This array can be manipulated,\n     * e.g. to remove listeners.\n     */\n    listenersAny() {\n        return this._anyListeners || [];\n    }\n    /**\n     * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the\n     * callback.\n     *\n     * Note: acknowledgements sent to the server are not included.\n     *\n     * @example\n     * socket.onAnyOutgoing((event, ...args) => {\n     *   //console.log(`sent event ${event}`);\n     * });\n     *\n     * @param listener\n     */\n    onAnyOutgoing(listener) {\n        this._anyOutgoingListeners = this._anyOutgoingListeners || [];\n        this._anyOutgoingListeners.push(listener);\n        return this;\n    }\n    /**\n     * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the\n     * callback. The listener is added to the beginning of the listeners array.\n     *\n     * Note: acknowledgements sent to the server are not included.\n     *\n     * @example\n     * socket.prependAnyOutgoing((event, ...args) => {\n     *   //console.log(`sent event ${event}`);\n     * });\n     *\n     * @param listener\n     */\n    prependAnyOutgoing(listener) {\n        this._anyOutgoingListeners = this._anyOutgoingListeners || [];\n        this._anyOutgoingListeners.unshift(listener);\n        return this;\n    }\n    /**\n     * Removes the listener that will be fired when any event is emitted.\n     *\n     * @example\n     * const catchAllListener = (event, ...args) => {\n     *   //console.log(`sent event ${event}`);\n     * }\n     *\n     * socket.onAnyOutgoing(catchAllListener);\n     *\n     * // remove a specific listener\n     * socket.offAnyOutgoing(catchAllListener);\n     *\n     * // or remove all listeners\n     * socket.offAnyOutgoing();\n     *\n     * @param [listener] - the catch-all listener (optional)\n     */\n    offAnyOutgoing(listener) {\n        if (!this._anyOutgoingListeners) {\n            return this;\n        }\n        if (listener) {\n            const listeners = this._anyOutgoingListeners;\n            for (let i = 0; i < listeners.length; i++) {\n                if (listener === listeners[i]) {\n                    listeners.splice(i, 1);\n                    return this;\n                }\n            }\n        }\n        else {\n            this._anyOutgoingListeners = [];\n        }\n        return this;\n    }\n    /**\n     * Returns an array of listeners that are listening for any event that is specified. This array can be ⟪ 16283 characters skipped ⟫;\n}\n","import io from \"socket.io-client\";\nimport React from 'react';\nimport axios from \"axios\";\n\n\nfunction authHeader () {\n    const response = sessionStorage.getItem('currentUser');\n    //console.log(\"Res = \" + response);\n    if (response)\n        return { Authorization: document.cookie };     \n    else\n        return {};\n}\n\nconst config = {\n   extraHeaders: authHeader(),\n}\nexport const socketGame = io('http://localhost:3002', config);\nexport const SocketGameContext = React.createContext(undefined);","// THIS FILE IS AUTO GENERATED\nimport { GenIcon } from '../lib';\nexport function IoAccessibilityOutline (props) {\n  return GenIcon({\"tag\":\"svg\",\"attr\":{\"viewBox\":\"0 0 512 512\"},\"child\":[{\"tag\":\"circle\",\"attr\":{\"cx\":\"256\",\"cy\":\"56\",\"r\":\"40\",\"fill\":\"none\",\"strokeLinejoin\":\"round\",\"strokeWidth\":\"32\"}},{\"tag\":\"path\",\"attr\":{\"fill\":\"none\",\"strokeLinejoin\":\"round\",\"strokeWidth\":\"32\",\"d\":\"M204.23 274.44c2.9-18.06 4.2-35.52-.5-47.59-4-10.38-12.7-16.19-23.2-20.15L88 176.76c-12-4-23.21-10.7-24-23.94-1-17 14-28 29-24 0 0 88 31.14 163 31.14s162-31 162-31c18-5 30 9 30 23.79 0 14.21-11 19.21-24 23.94l-88 31.9⟪ 882911 characters skipped ⟫response = await axios.get(\n            `http://localhost:3001/app/users/avatar/${user.login}`,\n          );\n          userInfo.avatar = response.data.avatar;\n        } catch (error) {\n          //console.log(error);\n        }\n        usersInfo.push(userInfo);\n      }\n      setUsersInfo(usersInfo);\n    },\n  });\n\n  const { data: infoUser, refetch: refetchInfoUser } = useQuery(GET_USER, {\n    variables: {\n      userID: currentLogin,\n    },\n  });\n\n\n  const [addToChat] = useMutation(ADDTOCHAT, {\n    onCompleted: async (data) => {\n      refetch();\n    },\n  });\n  const [promote] = useMutation(ADMIN, {\n    onCompleted: async (data) => {\n      refetch();\n    },\n  });\n  const [mute] = useMutation(MUTE, {\n    onCompleted: async (data) => {\n      refetch();\n    },\n  });\n  const [kick] = useMutation(KICK, {\n    onCompleted: async (data) => {\n      refetch();\n    },\n  });\n  const [block] = useMutation(BLOCK_USER, {\n    onCompleted: async (data) => {\n      refetchInfoUser();\n    },\n  });\n\n  // -------------------------------------------------------------------------- */\n\n  if (loading) {\n    return <>Loading...</>;\n  }\n  if (error) {\n    return <⟪ 14786 characters skipped ⟫                 );\n                                const target = userInfo.login;\n                                const id = sessionStorage.getItem('currentUser');\n                                //console.log(\n                                  `Sending invite from player ${id} to ${target}`,\n                                );\n                                axios.get(\n                                  `http://localhost:3001/app/users/invite/${id}/${target}`,\n                                );\n                              }}\n                            >\n                              <AiOutlineUserAdd\n                                size={20}\n                                color=\"Green\"\n                              ></AiOutlineUserAdd>\n                            </ActionIcon>\n                            <Text>Add to friend</Text>\n                          </Group>\n                        )}\n                    </Popover.Dropdown>\n                  )}\n                </Popover>\n              </Group>\n            ))}\n      </ScrollArea>\n\n      {currentChat.type === 'private' && (\n        <Button\n          style={{\n            marginLeft: 10,\n       ⟪ 9658 characters skipped ⟫${login_rec}`);\n            const newAvatars = { ...avatars };\n            newAvatars[login_rec] = response.data.avatar;\n            setAvatars(newAvatars);\n        } catch (error) {\n            //console.log(error);\n        }\n    }\n\n    function getAvatar(login_rec) {\n        !avatars[login_rec] && loadAvatar(login_rec);\n        return avatars[login_rec] ? avatars[login_rec] : null;\n    }\n\n\n    // ─────────────────────────────────────────────────────────────────────────────\n\n    const lastMute = chat.getMute.find((elem) => elem.login === currentLogin);\n\n    return (\n        <div>\n            {\n                chatMessages[0] ?\n                    <ScrollArea style={{ height: 450 }} scrollbarSize={0}>\n\n                        {\n                            chatMessages.map((elem: { message: string, userID: string, createdAt: Date }, index) => (\n                                <div key={index} id={'id' + index} className=\"message\" style={\n                                    data.getByLogin.blackList.includes(elem.userID) ? { filter: \"blur(3px)\" } : { filter: \"blur(0px)\" }\n                                }>\n                                    {\n     ⟪ 3915 characters skipped ⟫-------------------------------------------------------------- */\n\n    const { loading, error, data, subscribeToMore, refetch } = useQuery(GET_CHAT, {\n        onCompleted: (data) => {\n            //console.log(data);\n        },\n        variables: {\n            uuid: currentChat.uuid,\n        },\n        fetchPolicy: 'network-only',\n    });\n\n\n    if (loading) {\n        return <>Loading...</>;\n    }\n    if (error) {\n        return <>ERROR</>;\n    }\n\n    const subscribeToNewMessage = () => {\n        subscribeToMore({\n            document: MESSAGE_ADDED_SUBSCRIPTION,\n            variables: { uuid: currentChat.uuid },\n            updateQuery: (prev, { subscriptionData }) => {\n                if (!subscriptionData.data) {\n                    return prev;\n                }\n                const newFeedItem = subscriptionData.data.messageAdded;\n                const res = Object.assign({}, prev, {\n                    chats: {\n                        getMessages: [...prev.chats.getMessages, newFeedItem],\n                        getMute: prev.chats.getMute,\n                        getBan: prev.chats.getBan,\n                        muteID : prev.chats.muteID,\n ⟪ 14265 characters skipped ⟫ () => {\n            refetch();\n        },\n    });\n\n    const { data, loading, error } = useQuery(GET_USER, {\n        variables: {\n            userID: currentLogin,\n        },\n    });\n\n    //console.log();\n\n    /* -------------------------------------------------------------------------- */\n\n\n    return (\n        <div className=\"py-3 px-5\">\n            <Popup\n                open={showAskPassword}\n                onClose={() => setShowAskPassword(false)}\n                position=\"top center\"\n                modal\n                nested\n            >\n                <AskPassword\n                    togglePassword={toggleShowPassword}\n                    toggleShowMessages={toggleShowMessages}\n                    uuid={currentChat.uuid}\n                ></AskPassword>\n            </Popup>\n\n            <Popup\n                open={showEdit}\n                onClose={() => setShowEdit(false)}\n                position=\"top center\"\n                modal\n                nested\n            >\n                <EditChat toggleEdit={toggleShowEdit} refetch={refetch}></EditChat>\n            </Popup>\n\n            <Popup\n                open={showAddD⟪ 128282 characters skipped ⟫useState();\n  const Navigate = useNavigate();\n  \n  const socket: Socket = useContext(SocketGameContext);\n  const currentAvatar = useReactiveVar(currentAvatarVar);\n  \n  const Back = () => {\n    //console.log(\"Disconnect\");\n    Navigate('/');\n    sessionStorage.clear();\n    window.location.reload();\n  }\n  const PlayingState = () => {\n    socket.emit('isPlaying');\n  }\n  useEffect(() => {\n        socket.on('isPlaying', (isPlaying: boolean) => {\n        if (isPlaying)\n          Navigate('/Game');\n      });\n\n    const fetchAvatar = async () => {\n      await axios\n        .get(\n          `http://localhost:3001/app/users/profile/${sessionStorage.getItem(\n            'currentUser',\n          )}`,\n        )\n        .then((res) => {\n          currentAvatarVar(res.data.avatar);\n        })\n        .catch((err) => {\n          if (err)\n            setErrors(err.response.data);\n        });\n    };\n\n    if (!currentAvatar) {\n      fetchAvatar();\n    }\n    return () => {\n        socket.off('isPlaying');\n    }\n  }, []);\n\n  let style = {\n    width : \"12 rem\",\n  }\n\n  return (\n    <>\n      <Disclosure as=\"nav\" className=\"navbar\">\n        {({ open ⟪ 8668 characters skipped ⟫vigate();\n    const click = () => {\n        axios.get('http://localhost:3001/app/auth/who', {\n            headers: { Authorization: document.cookie },\n        }).then((response) => {\n            //console.log('Login -> ',response.data.login);\n        }).catch((error) => {\n            //console.log(error);\n        });\n    }\n\n    const joinLobby = () => {\n        socket.emit('JoinLobby')\n    }\n    const leaveLobby = () => {\n        socket.emit('LeaveLobby')\n    }\n    const SpectateLobby = () => {\n        socket.emit('Spectate');\n    }\n    if (socket)\n    { \n        socket.on('Test', () => {\n            Navigate('/Disconnected');\n        });\n    }\n\n    return (\n        <div>\n            <Navb/>\n            <div className=\"flex-container\">\n                <div className=\"mc-menu\">\n                    <div className=\"mc-button full\">\n                        <Nav.Link as={Link} to=\"/CreateLobby\" className=\"title\">Create Lobby</Nav.Link>\n                    </div>\n                    <div className=\"mc-button full\">\n                        <Nav.Link onClick={joinLobby} className=\"title\">Find Lobby</Nav.Link>\n                    </div>\n                    <div className=\"mc-button full\">\n                        <Nav.Link onClic⟪ 6775 characters skipped ⟫asRef = useRef<HTMLCanvasElement>(null);\n    const graph = new gameInfo(1920, 1080);\n    let boxDimen:any = {width: 1920, height: 1080};\n    const [disco, setDisco] = React.useState(false);\n\n    console.log('Gaming');\n\n    function copy(cp:gameInfo) {\n        Info = cp;\n    }\n    useEffect(() => {\n            let canvas: HTMLCanvasElement | null;\n            let context: CanvasRenderingContext2D | null;\n            let animationFrameId: number;\n\n            socket.on('Ping', (data:gameInfo) => {\n                copy(data);\n            });\n            socket.on('GameEnd', () => {\n                console.log('Disconnected');\n                setDisco(true);\n            });\n\n            socket.emit('Ping', (co:boolean) => {\n                if (!co)\n                    setDisco(true);\n            });\n\n            function Draw (inf:gameInfo, boxDimen:any) {\n                ResetBall();\n                DrawScore(boxDimen.width / 4, boxDimen.height / 4, '#ffffff', inf.Player1.score.toString());\n                DrawScore(3 * boxDimen.width / 4, boxDimen.height / 4, '#ffffff',inf.Player2.score.toString());\n                DrawRec(inf.Player1.x, inf.Player1.y, inf.Player1.width, inf.Player1.height, inf.Player1.color);\n                DrawRec(inf.Player2.x, inf.Player2.y, inf.Player2.width, inf.Player2.height, inf.Player2.color);\n                DrawBall(inf.Balling.x, inf.Balling.y, inf.Balling.radius, inf.Balling.color);\n            }\n            function DrawScore(x:number, y:number, color:string, text:string)\n            {\n                context.fillStyle = color⟪ 2290 characters skipped ⟫Down' === e.key)\n                        socket.emit('PaddleDown', false)\n                });\n            }\n            render();\n            if (Info && Info.Running === false)\n                console.log('Game not running');\n            return () => {\n                if (animationFrameId) {\n                    cancelAnimationFrame(animationFrameId);\n                }\n                socket.off('Ping');\n                socket.off('GameEnd');\n            }\n    }, [disco]);\n\n    console.log(disco);\n\n    return (\n        <div>\n            {!disco && <canvas ref={canvasRef} id=\"responsive-canvas\"/>}\n            {disco && <Disconnected/>}\n        </div>);\n}\n","\nimport {useNavigate} from \"react-router-dom\";\nimport Nav from \"../components/NavBar\";\nimport { gameInfo } from \"../components/Canvas\";\nimport { MatchHistoryDto } from \"../dto/dto\";\nimport { useEffect, useState } from \"react\";\nimport {GameWon} from \"./GameResult\";\nimport {GameLost} from \"./GameResult\";\nimport {Disconnected} from \"./GameResult\";\nimport { Socket } from \"socket.io-client\";\nimport { SocketGameContext } from \"../socketManager\";\nimport { useContext } from \"react\";\nimport { Gaming } from \"../components/Canvas\";\n\n\nfunction GamePage() {\n    \n    const socket: Socket = useContext(SocketGameContext);\n    const [Won, setWon] = useState<boolean>(false);\n    const [Lost, setLost] = useState<boolean>(false);\n    const [Info, setInfo] = useState<MatchHi⟪ 4141 characters skipped ⟫[end, setEnd] = useState(false);\n    const [Info, setInfo] = useState<MatchHistoryDto>(null);\n\n    useEffect(() => {\n\n        socket.on('SpectateResult', (info:MatchHistoryDto) => {\n            console.log(\"end\");\n            setEnd(true);\n            setInfo(info);\n            console.log(info);\n        })\n        return () => {\n            socket.off('SpectateResult');\n        }\n    }, [end, Info]);\n\n    return (\n        <div>\n            {!end && <GameRender/>}\n            {end && <SpectateResult Winner={Info.Winner} Loser={Info.Loser} scoreX={Info.scoreX} scoreY={Info.scoreY} date={Info.date}/>}\n        </div>\n    )\n}\n\nexport default SpectatePage;","import { Link, useNavigate } from 'react-router-dom';\nimport React, { useEffect } from 'react';\nimport Navb from \"../components/NavBar\";\nimport Nav from 'react-bootstrap/Nav';\n//import {game} from '../App';\nimport { InviteModal } from '../assets/modal';\n\nconst HomePage = () => {\n    return (\n        <div>\n            <Navb/>\n            <div className=\"flex-container\">\n                <div className=\"mc-menu\">\n                    <div className=\"mc-button full\">\n                        <Nav.Link as={Link} to=\"/Lobby\" className=\"title\">Play</Nav.Link>\n                  ⟪ 2462 characters skipped ⟫efault();\n    await axios\n      .get(\n        `http://localhost:3001/app/users/switch2fa/${sessionStorage.getItem(\n          'currentUser',\n        )}`,\n      )\n      .then((res) => {\n        console.log(res.data);\n        setIsEnabled(!isEnabled);\n      })\n      .catch((err) => {\n        console.error(err.response.data);\n      });\n  };\n\n  return (\n    <div className='center'>\n      <div style={{color : \"white\"}}>\n          <button className=\"mc-button fa\" onClick={handleClick}>\n            {isEnabled ? 'Disable 2FA' : 'Enable 2FA'}\n          </button>\n      </div>\n    </div>\n  );\n};\n","import { useEffect, useState } from 'react';\nimport axios from 'axios';\nimport { DisplayErrors } from './DisplayErrors';\nimport { Card, Progress } from '@mantine/core';\nimport { AiFillEdit } from 'react-icons/ai';\nimport { MatchHistory } from './MatchHistory';\nimport { Switch2fa } from './Switch2fa';\n\nexport const Profile = () => {\n  const [avatar, setAvatar] = useState<string>();\n  const [login, setLogin] = useState<string>();\n  const [file, setFile] = useState<any>();\n  const [errors, setErrors] = useState();\n  const [playerData, setPlayerData] = useState⟪ 601 characters skipped ⟫n,\n      };\n      await axios\n        .post('http://localhost:3001/app/users/profile', data)\n        .then((res) => {\n          setErrors(null);\n          setAvatar(res.data.avatar);\n          console.log('this is player data', res.data);\n          setPlayerData(res.data);\n        })\n        .catch((err) => {\n          console.error(err.response.data);\n          setErrors(err.response.data);\n        });\n    };\n\n    if (!avatar) fetchAvatar();\n    if (!playerData) handleProfile();\n  }, []);\n\n  const handleChange = async (event: any) => {\n    const file = event.target.files?.[0];\n    setFile(file);\n    const formData = new FormData();\n    formData.append('user', sessionStorage.getItem('currentUser'));\n    formData.append('file', file);\n    await axios\n      .post('http://localhost:3001/app/users/avatar', formData)\n      .then((res) => {\n        setAvatar(res.data?.avatar);\n      })\n      .catch((err) => {\n        console.log(err.response.data);\n        setErrors(err.response.data);\n      });\n  };\n\n  if (playerData === undefined) return <div>Loading...</div>;\n  return (\n    <Card shadow=\"sm\" p=\"lg\" radius=\"md\" className=\"card\" withBorder>\n      <h1 className=\"card-title text-center\">Profile</h1>\n      <div className=\"card-profile\">\n        <div className=\"profile-pic\">\n          <label className=\"-label\" htmlFor=\"file\">\n            <AiFillEdit className=\"edit-icon-react\"></AiFillEdit>\n          </label>\n          <input id=\"file\" type=\"file\" onChange={handleChange} />\n          <img\n            alt=\"avatar\"\n            src={`data:image/jpeg;base64,${avatar}`}\n            id=\"output\"\n            width=\"200\"\n          />\n        </div>\n        <div className=\"user-info\">\n          <h2>{playerData.pseudo}</h2>\n        </div>\n      </div>\n\n      <ul className=\"match-list\">\n        <MatchHistory />\n      </ul>\n      <div>\n        <Switc⟪ 4040 characters skipped ⟫assword, setPassword] = useState('');\n  const [errors, setErrors] = useState();\n\n  const navigate = useNavigate();\n  const handleSubmit = async (event: any) => {\n    event.preventDefault();\n    console.log();\n    const formData = new FormData(event.currentTarget);\n    const form = {\n      login: formData.get('login'),\n      password: formData.get('password'),\n    };\n    \n    axios\n      .post('http://localhost:3001/app/auth/signin', form, {\n        headers: {},\n      })\n      .then((response) => {\n        console.log('response = ', response);\n        document.cookie = response.data.cookie;\n        console.log('token = ', response.data.cookie);\n        sessionStorage.setItem('currentUser', response.data.user.id);\n        console.log(response.data.fLog);\n        if (response.data.user.has2fa) navigate('/Code2FA');\n        else if (response.data.fLog) navigate('/FirstLog');\n        else navigate('/CoPage');\n        window.location.reload();\n      })\n      .catch((err) => {\n        NotifyError('Invalid credentials');\n      });\n  };\n\n  return (\n    <div>\n      <ReactNotifications />\n      <div className=\"flex-container\">\n        <div>\n          <h1 className=\"text-center\">SIGNIN</h1>\n          <form onSubmit={handleSubmit}>\n            <div className=\"mc-menu\">\n              <input\n                className=\"mc-button full\"\n                required\n                type=\"text\"\n                name=\"login\"\n                placeholder=\"login\"\n                value={login}\n                onChange={(e) => setLogin(e.target.value)}\n              />\n              <input\n                className=\"mc-button full\"\n                required\n                type=\"passwo⟪ 1177 characters skipped ⟫ \n    const socket: Socket = useContext(SocketGameContext);\n    const Navigate = useNavigate();\n\n    const addLobby = () => {\n        socket.emit('CreateLobby', (response: any) => {\n            console.log(response);\n            NotifySuccess(response);\n        });\n    }\n\n    const addRainbowLobby = () => {\n        socket.emit('CreateRainbowLobby', (response: any) =>{\n            NotifySuccess(response);\n        });\n    }\n    const printLobby = () => {\n        socket.emit('LobbyInfo');\n    }\n    \n\n        return (\n            <div>\n                <ReactNotifications />\n                <Navb/>\n                <div className=\"flex-container\">\n                    <div className=\"mc-menu\">\n                        <div className=\"mc-button full\">\n                            <Nav.Link onClick={addLobby} className=\"title\">Create classic Lobby</Nav.Link>\n                        </div>\n                        <div className=\"mc-button full\">\n                            <Nav.Link onClick={addRainbowLobby} className=\"title\">Create Rainbow Day Lobby</Nav.Link>\n                        </div>\n                        <div className=\"mc-button full\">⟪ 734905 characters skipped ⟫\n            fetchAvatar();\n        if (!playerData)\n            handleProfile();\n    }, [avatar, playerData, log]);\n    if (playerData === undefined)\n        return <div>Loading...</div>;\n    console.log(playerData);\n    return (\n        <Card shadow=\"sm\" p=\"lg\" radius=\"md\" className='card' withBorder>\n          <h1 className=\"card-title text-center\">Profile</h1>\n          <div className='card-profile'>\n            <div className=\"profile-pic\">\n            <div className=\"-label\">\n              <img src={`data:image/jpeg;base64,${avatar}`} id=\"output\" width=\"200\" />\n            </div>\n            </div>\n            <div className=\"user-info\">\n              <h2>{playerData.pseudo} {playerData.status === 'online' ? <FcCheckmark> Online </FcCheckmark> : <RxCross1 color='red'> Offline </RxCross1>}</h2>\n            </div>\n          </div>\n          </Card>)\n}","import Nav from '../components/NavBar';\nimport { UserProfile } from '../components/UserProfile';\n\nfunction UserProfilePage(props:any) {\n\n  return (\n    <div>\n        <Nav />\n        <UserProfile />\n    </div>\n  )\n}\n\nexport default UserProfilePage;","import { createStyles, Mant⟪ 6956 characters skipped ⟫ost:3001/app/users/remove/${sessionStorage.getItem(\n                          'currentUser',\n                        )}/${id.login}`,\n                      )\n                      .catch((err) => console.log(err))\n                      .then(() => window.location.reload());\n                  }}\n                >\n                  Remove / Unfriend\n                </Button>\n        </td>\n    </tr>\n  ));\n\n  console.log(invites);\n  const FriendRequest = invites.map((id) => (\n    <tr key={id.id}>\n      <td className='friend'>\n        <Avatar src={`data:image/jpeg;base64,${id.avatar}`} size=\"md\"/>\n        {id.pseudo} {id.status === \"online\" ? <FcCheckmark/> : <RxCross1 color='red'/>}\n        <Button\n                  onClick={async () => {\n                    await axios\n                      .get(\n                        `http://localhost:3001/app/users/accept/${sessionStorage.getItem(\n                          'currentUser',\n                        )}/${id.login}`,\n                      )\n                      .catch((err) => console.log(err))\n                      .then(() => window.location.reload());\n\n                      createChat({\n                        variables: {\n                          newChat: { name: id.pseudo, type: \"dm\", password: \"\", ownerID: id.login, userID: [currentLogin, id.login] },\n                        }\n                      });\n                  }\n                }\n                >\n                  Accept\n                </Button>\n                <Button\n                  onClick={async () => {\n                    await axios\n                      .get(\n                        `http://localhost:3001/app/users/decline/${sessionStorage.getItem(\n                          'currentUser',\n                        )}/${id.login}`,\n                      )\n                      .catch((err) => console.log(err))\n                      .then(() => window.location.reload());\n                  }}\n                >\n                  Decline\n                </Button>\n        </td>\n    </tr>\n  ));\n\n\n  return (\n    <div>\n      <ScrollArea h={600} >\n        <Table miw={700}>\n          <thead >\n            <tr>\n              <th>Friend</th>\n            </tr>\n          </thead>\n          <tbody>{Friend_List}</tbody>\n        </Table>\n      </ScrollArea>\n      <ScrollArea h={200} >\n      <Table miw={700}>\n        <thead >\n          <tr>\n            <th>Request</th>\n          </tr>\n        </thead>\n        <tbody>{FriendRequest}</tbody>\n      </Table>\n    </ScrollArea>\n  </div>\n  );\n};\n","import { Card } from '@mantine/core';\nimport Nav from '../components/NavBar';\nimport '../assets/Leadb.css';\nimport { FriendList } from '../components/FriendList';\n\nfunction FriendListPage() {\n  return (\n    <div>\n      <Nav />\n      <Card shadow=\"sm\" p=\"lg\"⟪ 832 characters skipped ⟫sessionStorage.getItem(\n          'currentUser',\n        )}`,\n        form,\n        {\n          headers: { Authorization: document.cookie },\n        },\n      )\n      .then((res) => {\n        console.log(res);\n        navigate('/CoPage');\n      })\n      .catch((err) => {\n        console.log(err);\n        navigate('/Code2FA');\n        NotifyError('Invalid code');\n      });\n  };\n\n  return (\n    <div>\n      <div className=\"flex-container\">\n        <div>\n          <h1 className=\"text-center\">2FA CHECK</h1>\n            <form onSubmit={handleSubmit}>\n            <div className=\"mc-menu\">\n                <input\n                  className=\"mc-button full\"\n                  type=\"text\"\n                  name=\"code\"\n                  placeholder=\"code\"\n                  value={code}\n                  onChange={(e) => setCode(e.target.value)}\n                />\n              </div>\n              <button className=\"mc-button full \" type=\"submit\">SUBMIT</button>\n              <div className=\"text-center\">\n                <DisplayErrors errors={errors} />\n              </div>\n            </form>\n          </div>\n        </div>\n      </div>\n  );\n};\n","import { Code2FA } from '../components/Code2FA';\n\nfunction Code2FAPage⟪ 218309 characters skipped ⟫.emit('RefuseInvite', Name);\n  }\n\n  useEffect(() => {\n      socket.on('Waiting Room', () => {\n          Navigate('/RoomWaiting');\n      });\n      socket.on('AlreadyConnected', () => {\n        console.log(\"Disconnect\");\n        Navigate(\"/\");\n      });\n      socket.on('Ready', () => {\n        Navigate('/Game');\n      });\n      socket.on('InviteToGame', (data:any) => {\n          setInvite(true);\n          setName(data);\n          open();\n      });\n      socket.on('RefuseToGame', (data:any) => {\n          setInvite(false);\n          setName('');\n          NotifyError(`${data} refuse to play with you`);\n          Navigate('/HomePage');\n      });\n      socket.on('SpectateReady', () => {\n            Navigate('/Spectate');\n      });\n      socket.on('RemovePlayer', () => {\n        document.cookie = \"\";\n        sessionStorage.removeItem('currentUser');\n        Navigate('/');\n      });\n      socket.on('Berror', (data:any) => {\n        NotifyError(data);\n      });\n      return () => {\n        socket.off('Waiting Room');\n        socket.off('InviteToGame');\n        socket.off('RefuseToGame');\n        socket.off('Ready');\n        socket.off('Spectat⟪ 3179 characters skipped ⟫('isAuthorized', 'true');\n      window.location.href = 'http://localhost:3001/app/auth';\n    }\n    if (isAuthorized) setIsLoaded(true);\n  }, []);\n\n  const particlesInit = async (main) => {\n    console.log(main);\n    await loadFull(main);\n  };\n\n  const myCache = createEmotionCache({\n    key: 'mantine',\n    prepend: false,\n  });\n\n  if (isLoaded) {\n    return (\n      <div>\n        <SocketGameContext.Provider value={socketGame}>\n          <MantineProvider emotionCache={myCache}>\n            <ApolloProvider client={client}>\n              <WebsocketProvider value={socket}>\n                <ToastContainer />\n                <Pathing />\n                <InviteModal />\n              </WebsocketProvider>\n            </ApolloProvider>\n          </MantineProvider>\n        </SocketGameContext.Provider>\n      </div>\n    );\n  } else if (!isLoaded) {\n    return <div>Loading...</div>;\n  }\n}\n\nexport default App;\n","import React from 'react';\nimport ReactDOM from 'react-dom/client';\nimport App from './App';\nimport './index.css';\nimport './App.css';\nimport { BrowserRouter } from 'react-router-dom';\n\nconst root = ReactDOM.createRoot(\n  document.getElementBy
+
+frontend/src/App.tsx:
+  50    const particlesInit = async (main) => {
+  51:     console.log(main);
+  52      await loadFull(main);
+
+frontend/src/socketManager.tsx:
+  7      const response = sessionStorage.getItem('currentUser');
+  8:     console.log("Res = " + response);
+  9      if (response)
+
+frontend/src/assets/modal.tsx:
+  36        socket.on("isPlaying", (data:boolean) => {
+  37:       console.log("isNOTPlaying");
+  38        if (data) {
+  39:         console.log("isPlaying");
+  40          Navigate('/HomePage');
+
+  46        socket.on('AlreadyConnected', () => {
+  47:         console.log("Disconnect");
+  48          Navigate("/");
+
+frontend/src/components/Canvas.tsx:
+  115  
+  116:     console.log('Gaming');
+  117  
+
+  129              socket.on('GameEnd', () => {
+  130:                 console.log('Disconnected');
+  131                  setDisco(true);
+
+  213              if (Info && Info.Running === false)
+  214:                 console.log('Game not running');
+  215              return () => {
+
+  224  
+  225:     console.log(disco);
+  226  
+
+frontend/src/components/Code2FA.tsx:
+  28        .then((res) => {
+  29:         console.log(res);
+  30          navigate('/CoPage');
+
+  32        .catch((err) => {
+  33:         console.log(err);
+  34          navigate('/Code2FA');
+
+frontend/src/components/FileUpload.tsx:
+  35          });
+  36:         console.log(res?.data);
+  37        })
+  38        .catch((err) => {
+  39:         console.log(err?.response?.data);
+  40        });
+
+frontend/src/components/FirstLog.tsx:
+  23          .catch((err) => {
+  24:           console.log(err);
+  25          });
+
+frontend/src/components/FriendList.tsx:
+   56                        )
+   57:                       .catch((err) => console.log(err))
+   58                        .then(() => {
+
+   72  
+   73:   console.log(invites);
+   74    const FriendRequest = invites.map((id) => (
+
+   86                        )
+   87:                       .catch((err) => console.log(err))
+   88                        .then(() => {
+
+  109                        )
+  110:                       .catch((err) => console.log(err))
+  111                        .then(() => window.location.reload());
+
+frontend/src/components/NavBar.tsx:
+  41    const Back = () => {
+  42:     console.log('Disconnect');
+  43      Navigate('/');
+
+  60       {
+  61:       console.log('COOKIE CHAT--->', document.cookie);
+  62        if (document.cookie === null) {
+  63:         console.log('prout2');
+  64          Navigate('/');
+
+  71          .then((res) => {
+  72:           console.log(res);
+  73            //sessionStorage.setItem('currentUser', res.data.id);
+  74          }).catch((err) => {
+  75:           console.log(err);
+  76            Navigate('/');
+
+  96          .catch((err) => {
+  97:           console.log(err);
+  98            Navigate('/');
+
+frontend/src/components/Profile.tsx:
+  22      const fetchUser = async () => {
+  23:       console.log('COOKIE CHAT--->', document.cookie);
+  24        if (document.cookie === null) {
+  25:         console.log('prout');
+  26          Navigate('/');
+
+  36          }).catch((err) => {
+  37:           console.log(err);
+  38            Navigate('/');
+
+  58          .catch((err) => {
+  59:           console.log(err);
+  60          });
+
+  71            setAvatar(res.data.avatar);
+  72:           console.log('this is player data', res.data);
+  73            setPlayerData(res.data);
+
+frontend/src/components/SignIn.tsx:
+  16      event.preventDefault();
+  17:     console.log();
+  18      const formData = new FormData(event.currentTarget);
+
+frontend/src/components/SignUp.tsx:
+  32        .catch((err) => {
+  33:         console.log('err = ', err.response.data.message);
+  34          let errorMessage = [];
+
+frontend/src/components/Switch2fa.tsx:
+  13        .then((res) => {
+  14:         console.log(res.data);
+  15          window.location.reload();
+
+frontend/src/components/UserProfile.tsx:
+  33                    //   sessionStorage.clear();
+  34:                   //   console.log(2);
+  35                    //   Navigate('/Disconnected');
+
+frontend/src/components/Chat/chat.tsx:
+  39      const fetchUser = async () => {
+  40:       console.log('COOKIE CHAT--->', document.cookie);
+  41        if (document.cookie === null) {
+  42:         console.log('prout1');
+  43          Navigate('/');
+
+  50          .then((res) => {
+  51:           console.log(res);
+  52            //sessionStorage.setItem('currentUser', res.data.id);
+  53          }).catch((err) => {
+  54:           console.log(err);
+  55            Navigate('/');
+
+  79          .catch((err) => {
+  80:           console.log(err);
+  81            Navigate('/');
+
+frontend/src/components/Chat/listChat.tsx:
+  102          }).catch((error) => {
+  103:             console.log(error);
+  104          })
+
+frontend/src/components/Chat/chatmsg/listMsg.tsx:
+  34          onCompleted: (data) => {
+  35:             console.log(data);
+  36          },
+
+frontend/src/components/Chat/chatmsg/member_list.tsx:
+  124          } catch (error) {
+  125:           console.log(error);
+  126          }
+
+  129        setUsersInfo(usersInfo);
+  130:       console.log(usersInfo);
+  131      },
+
+  548                                  const id = sessionStorage.getItem('currentUser');
+  549:                                 console.log(
+  550                                    `Sending invite from player ${id} to ${target}`,
+
+frontend/src/components/Chat/chatmsg/messages.tsx:
+  76          } catch (error) {
+  77:             console.log(error);
+  78          }
+
+frontend/src/components/Chat/popup/createChat.tsx:
+  57        .catch(e => {
+  58:         console.log(e);
+  59          if (groupname === "") {
+
+frontend/src/pages/CoPage.tsx:
+  46          .catch((err) => {
+  47:           console.log(err);
+  48          });
+
+frontend/src/pages/CreateLobby.tsx:
+  19          socket.emit('CreateLobby', (response: any) => {
+  20:             console.log(response);
+  21              NotifySuccess(response);
+
+frontend/src/pages/LobbyPage.tsx:
+  19          }).then((response) => {
+  20:             console.log('Login -> ',response.data.login);
+  21          }).catch((error) => {
+  22:             console.log(error);
+  23          });
+
+  37          socket.on('Test', () => {
+  38:             console.log(4);
+  39              Navigate('/Disconnected');
+
+frontend/src/pages/LoginPage.tsx:
+  16    // axios.get('http://localhost:3001/app/auth').then((res) => {
+  17:   //   console.log(res);
+  18    // }
+
+frontend/src/pages/SpectatePage.tsx:
+  26          socket.on('SpectateResult', (info:MatchHistoryDto) => {
+  27:             console.log("end");
+  28              setEnd(true);
+  29              setInfo(info);
+  30:             console.log(info);
+  31          })
